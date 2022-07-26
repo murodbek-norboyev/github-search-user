@@ -2,7 +2,7 @@
   <div>
     <header>
       <h1>devfinder</h1>
-      <button class="btn btn-switch">dark</button>
+      <!--      <button class="btn btn-switch">dark</button>-->
     </header>
 
     <div>
@@ -32,7 +32,7 @@
               <div class="result__user">@{{ results.login }}</div>
             </div>
 
-            <div class="result__date">Joined {{ joined }}</div>
+            <div class="result__date">{{ joined }}</div>
           </div>
 
           <div v-if="results.bio" class="result__bio">{{ results.bio }}</div>
@@ -67,7 +67,10 @@
               {{ results.location ? results.location : "Not available" }}
             </div>
             <div class="result__info" :class="results.blog ? 'available' : ''">
-              {{ results.blog ? results.blog : "Not available" }}
+              <a v-if="results.blog" :href="results.blog" target="_blank">{{
+                results.blog
+              }}</a>
+              <span v-else>Not available</span>
             </div>
             <div
               class="result__info"
@@ -112,7 +115,13 @@ export default {
   },
   computed: {
     joined() {
-      return this.results.created_at.split("T").shift().split("-");
+      const isoStr = this.results.created_at;
+      const result = new Date(isoStr);
+
+      return `Joined ${result.getHours()} ${result.toLocaleString("en-US", {
+        month: "short",
+      })} ${result.getFullYear()}`;
+      // return this.results.created_at ? this.results.created_at.toString() : "";
     },
   },
   methods: {
@@ -121,7 +130,6 @@ export default {
         axios
           .get("https://api.github.com/users/" + this.username)
           .then((response) => {
-            console.log(response.data);
             this.results = response.data;
             this.error = "";
           })
@@ -140,7 +148,6 @@ export default {
     axios
       .get("https://api.github.com/users/murodbek-norboyev")
       .then((response) => {
-        console.log(response.data);
         this.results = response.data;
         this.error = "";
       })
